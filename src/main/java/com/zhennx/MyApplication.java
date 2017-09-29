@@ -3,7 +3,7 @@ package com.zhennx;
 /**
  * @author Jiang Hongfei <jiang.hongfei@mhccenter.com>
  */
-import java.util.LinkedHashSet;
+
 import java.util.Set;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
@@ -13,8 +13,10 @@ public class MyApplication extends Application {
 
     @Override
     public Set<Class<?>> getClasses() {
-        Set<Class<?>> resources = new LinkedHashSet<Class<?>>();
-        resources.add(HelloResource.class);
-        return resources;
+        // Since resources are registered in ApplicationModule,
+        // it should not be registered here,
+        // otherwise injection of Guice won't work.
+
+        return super.getClasses();
     }
 }

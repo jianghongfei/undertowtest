@@ -1,34 +1,35 @@
 package com.zhennx;
 
-import io.undertow.Undertow;
-import io.undertow.server.handlers.resource.FileResourceManager;
-import io.undertow.servlet.Servlets;
-import io.undertow.servlet.api.DeploymentInfo;
-
-import org.jboss.resteasy.plugins.server.undertow.UndertowJaxrsServer;
-
-import java.io.File;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 
 /**
  * Hello world!
  */
 public class App {
     public static void main(final String[] args) {
-        String contextPath = "/";
-        String deploymentName = "My Application";
+        Injector injector = Guice.createInjector(new ApplicationModule());
 
-        Undertow.Builder serverBuilder = Undertow.builder().addHttpListener(8080, "localhost");
-        UndertowJaxrsServer server = new UndertowJaxrsServer();
-        server.start(serverBuilder);
-
-        DeploymentInfo di = server.undertowDeployment(MyApplication.class)
-                .setClassLoader(App.class.getClassLoader())
-                .setContextPath(contextPath)
-                .setDeploymentName(deploymentName)
-                .setResourceManager(new FileResourceManager(new File("src/main/webapp"), 1024))
-                .addWelcomePage("index.html")
-                .addServlets(Servlets.servlet("ExampleServlet", ExampleServlet.class).addMapping("/servlet"));
-
-        server.deploy(di);
+        ServletServer server = injector.getInstance(ServletServer.class);
+        server.start();
     }
+
+//    public static void main(final String[] args) {
+//        DeploymentInfo servletBuilder =
+//                Servlets.deployment().setDeploymentName("wm.war").setClassLoader(App.class.getClassLoader()).setContextPath("/wm")
+//                        .addInitParameter("resteasy.guice.modules", ApplicationModule.class.getName())
+//                        .addListener(new ListenerInfo(GuiceResteasyBootstrapServletContextListener.class))
+//                        .addServlets(Servlets.servlet("Resteasy", HttpServletDispatcher.class).addMapping("/*"));
+//
+//        DeploymentManager manager = Servlets.defaultContainer().addDeployment(servletBuilder);
+//        manager.deploy();
+//
+//        // HttpHandler servletDeploymentHandler = manager.start();
+//
+//        // PathHandler pathHandler = Handlers.path(Handlers.redirect("/wm")).addPrefixPath("/wm", servletDeploymentHandler);
+//
+//        Undertow server = Undertow.builder().addHttpListener(8080, "localhost").build();
+//
+//        server.start();
+//    }
 }
